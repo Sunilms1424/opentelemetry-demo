@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+    environment {
+        IMAGE_TAG = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+        DOCKER_IMAGE = "sunhar0724/accountingservice:${IMAGE_TAG}"
+    }
+    stages {
+        stage('Restore Dependencies') {
+            steps {
+                sh 'dotnet restore'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'dotnet build'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'dotnet test'
+            }
+        }
+        stage('Docker Build & Push') {
+            steps {
+                sh 'docker build -t ${DOCKER_IMAGE} .'
+                sh 'docker push ${DOCKER_IMAGE}'
+            }
+        }
+    }
+}
